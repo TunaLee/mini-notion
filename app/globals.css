@@ -1,0 +1,53 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif; color: #222; background: #fff; }
+input, textarea, button { font: inherit; color: inherit; }
+input, textarea { border: 1px solid #ddd; border-radius: 6px; padding: 8px 10px; }
+button { border: 1px solid #ccc; border-radius: 6px; background: #fff; padding: 6px 12px; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+button.primary { background: #222; border-color: #222; color: #fff; }
+button.danger { color: #b42318; border-color: #e5b5b0; }
+button.link { border: 0; background: none; padding: 6px 0; text-align: left; color: #555; }
+.hint { color: #777; font-size: 14px; }
+.error { color: #b42318; font-size: 14px; }
+
+.login { max-width: 320px; margin: 80px auto; padding: 0 16px; }
+.login form, .login label { display: flex; flex-direction: column; gap: 6px; }
+.login form { gap: 14px; margin-bottom: 12px; }
+.login p { margin: 0; }
+
+.app { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100dvh; }
+aside { display: flex; flex-direction: column; gap: 6px; padding: 16px; background: #f7f7f5; border-right: 1px solid #e8e8e4; }
+nav { flex: 1; overflow: auto; }
+nav ul { list-style: none; margin: 0; padding: 0; }
+nav ul ul { padding-left: 16px; }
+.row { display: flex; align-items: center; border-radius: 6px; }
+.row.selected { background: #e8e8e4; }
+.row button { border: 0; background: none; padding: 5px 4px; }
+.toggle { width: 22px; flex: none; text-align: center; }
+.row .title { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.email { margin: 0; overflow-wrap: anywhere; }
+
+.app main { width: 100%; max-width: 760px; padding: 24px; }
+.head { display: flex; gap: 8px; }
+.page-title { flex: 1; min-width: 0; font-size: 24px; font-weight: 600; }
+textarea { width: 100%; min-height: 40vh; resize: vertical; line-height: 1.6; }
+.todos { border-top: 1px solid #e8e8e4; margin-top: 16px; }
+.todos h2 { font-size: 16px; }
+.todos ul { list-style: none; margin: 0; padding: 0; }
+.todos li { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.todos input[type="text"] { flex: 1; min-width: 0; }
+.todos li.done input[type="text"] { color: #888; text-decoration: line-through; }
+.foot { display: flex; justify-content: space-between; margin-top: 24px; }
+.message { background: #f1f1ee; border-radius: 6px; padding: 8px 12px; }
+
+.overlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgb(0 0 0 / .35); padding: 16px; }
+.dialog { background: #fff; border-radius: 10px; padding: 20px; max-width: 380px; width: 100%; }
+.dialog h2 { margin-top: 0; font-size: 18px; }
+.dialog button { margin: 0 8px 0 0; }
+
+@media (max-width: 640px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  aside { border-right: 0; border-bottom: 1px solid #e8e8e4; }
+  nav { max-height: 30vh; }
+  .app main { padding: 16px; }
+}

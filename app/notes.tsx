@@ -40,7 +40,6 @@ export default function Notes({ email }: { email: string }) {
   const [message, setMessage] = useState("");
   const [conflict, setConflict] = useState<Conflict | null>(null);
   const working = useRef(false);
-  const modal = useRef<HTMLDivElement>(null);
 
   const dirty = saved !== null && !same(saved, draft);
   const word = query.trim();
@@ -72,16 +71,6 @@ export default function Notes({ email }: { email: string }) {
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
-  // 모달이 열리면 그 안으로 초점을 옮긴다. 새 글(제목 없음)은 제목부터 쓴다.
-  const openId = saved?.id;
-  useEffect(() => {
-    const box = modal.current;
-    if (!box) return;
-    const title = box.querySelector<HTMLInputElement>(".page-title");
-    if (title && !title.value) title.focus();
-    else box.focus();
-  }, [openId]);
-
   /** 서버 작업은 한 번에 하나만 한다. */
   async function run(task: () => Promise<void>) {
     if (working.current) return;
@@ -105,22 +94,6 @@ export default function Notes({ email }: { email: string }) {
     setDraft(page ? contentOf(page) : EMPTY);
     setConflict(null);
   }
-
-  function close() {
-    if (working.current || !canLeave()) return;
-    show(null);
-    setMessage("");
-  }
-
-  // Esc 로 닫는다. 겹침 알림이 떠 있거나 한글을 조합하는 중이면 무시한다.
-  useEffect(() => {
-    if (!saved || conflict) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !event.isComposing) close();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
 
   function open(id: number) {
     if (working.current || !canLeave()) return;
@@ -211,12 +184,6 @@ export default function Notes({ email }: { email: string }) {
     });
   }
 
-  // 다시 고치기 시작하면 이전 안내("저장했어요" 등)는 지운다.
-  const edit = (patch: Partial<PageContent>) => {
-    setMessage("");
-    setDraft((now) => ({ ...now, ...patch }));
-  };
-
   const toggle = (id: number) =>
     setClosed((set) => {
       const next = new Set(set);
@@ -228,7 +195,7 @@ export default function Notes({ email }: { email: string }) {
 
   return (
     <div className="app">
-      <aside inert={saved !== null}>
+      <aside>
         <input type="search" aria-label="검색" placeholder="검색" value={query} onChange={(e) => setQuery(e.target.value)} />
         <button className="link" onClick={() => create(null)} disabled={busy}>+ 새 글</button>
         <nav>
@@ -254,19 +221,12 @@ export default function Notes({ email }: { email: string }) {
         <button className="link" onClick={logout}>로그아웃</button>
       </aside>
 
-      <main inert={saved !== null}>
-        {!saved && message && <p className="message" role="status">{message}</p>}
-        <p className="hint">왼쪽에서 글을 고르거나 새 글을 만드세요.</p>
-      </main>
-
-      {saved && (
-        // 바깥 어두운 곳을 누르면 닫는다. (글자를 끌어 선택하다 밖에서 놓는 것은 제외)
-        <div className="overlay" inert={conflict !== null} onMouseDown={(e) => e.target === e.currentTarget && close()}>
-          <div className="modal" role="dialog" aria-modal="true" aria-label="글" tabIndex={-1} ref={modal}>
-            <div className="modal-top">
-              <p className="hint" role="status">{message || (dirty ? "저장하지 않은 변경이 있어요" : "")}</p>
-              <button className="link" aria-label="닫기" onClick={close} disabled={busy}>✕</button>
-            </div>
+      <main>
+        {message && <p className="message" role="status">{message}</p>}
+        {!saved ? (
+          <p className="hint">왼쪽에서 글을 고르거나 새 글을 만드세요.</p>
+        ) : (
+          <>
             <div className="head">
               <input
                 className="page-title"
@@ -274,25 +234,26 @@ export default function Notes({ email }: { email: string }) {
                 placeholder="제목"
                 maxLength={300}
                 value={draft.title}
-                onChange={(e) => edit({ title: e.target.value })}
+                onChange={(e) => setDraft({ ...draft, title: e.target.value })}
               />
               <button className="primary" onClick={() => save()} disabled={busy}>저장</button>
             </div>
+            <p className="hint">{dirty ? "저장하지 않은 변경이 있어요" : " "}</p>
             <textarea
               aria-label="본문"
               placeholder="본문"
               maxLength={200000}
               value={draft.body}
-              onChange={(e) => edit({ body: e.target.value })}
+              onChange={(e) => setDraft({ ...draft, body: e.target.value })}
             />
-            <Todos key={saved.id} todos={draft.todos} onChange={(todos) => edit({ todos })} />
+            <Todos key={saved.id} todos={draft.todos} onChange={(todos) => setDraft({ ...draft, todos })} />
             <div className="foot">
               <button className="link" onClick={() => create(saved.id)} disabled={busy}>+ 안에 새 글</button>
               <button className="danger" onClick={remove} disabled={busy}>지우기</button>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </main>
 
       {conflict && (
         <div className="overlay">

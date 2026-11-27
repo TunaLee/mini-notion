@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git config *)",
+      "Bash(ssh -o BatchMode=yes -T git@github.com)",
+      "Bash(git ls-remote *)",
+      "Bash(gh repo *)"
+    ]
+  }
+}

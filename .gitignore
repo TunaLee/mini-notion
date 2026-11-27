@@ -1,0 +1,16 @@
+# 컴퓨터가 만드는 파일
+.DS_Store
+
+# 설치·빌드 결과물
+node_modules/
+.next/
+
+# 비밀 값
+.env*
+.claude/settings.local.json
+
+# 데이터 파일
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*

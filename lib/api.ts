@@ -1,4 +1,4 @@
-import { currentUser, type User } from "./auth";
+import { currentUser, guestId } from "./auth";
 
 export const fail = (status: number, error: string, extra: object = {}) =>
   Response.json({ error, ...extra }, { status });
@@ -23,8 +23,8 @@ export async function readJson(request: Request): Promise<Record<string, unknown
   }
 }
 
-/** 로그인한 사람만 통과시킨다. 막히면 Response 를 돌려준다. */
-export async function requireUser(request: Request): Promise<User | Response> {
+/** 로그인하지 않아도 통과시키고, 고친 사람으로 적을 번호를 돌려준다. 다른 사이트의 요청이면 Response 를 돌려준다. */
+export async function requireActor(request: Request): Promise<number | Response> {
   if (!sameOrigin(request)) return fail(403, "허용되지 않은 요청이에요");
-  return (await currentUser()) ?? fail(401, "로그인이 필요해요");
+  return (await currentUser())?.id ?? guestId();
 }

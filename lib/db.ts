@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS pages (
   updated_at INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS pages_parent ON pages(parent_id);
+-- 로그인하지 않고 쓴 글의 '고친 사람'. 이메일 모양이 아니라 가입할 수 없고, 0 뿐인 지문이라 로그인할 수 없다.
+INSERT OR IGNORE INTO users (email, password_hash, created_at)
+VALUES ('guest', '${"0".repeat(32)}:${"0".repeat(128)}', 0);
 `;
 
 const globalForDb = globalThis as unknown as { db?: DatabaseSync };

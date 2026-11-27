@@ -66,6 +66,7 @@ export default function LoginForm() {
       >
         {signup ? "이미 계정이 있어요 → 로그인하기" : "처음이에요 → 가입하기"}
       </button>
+      <a className="link" href="/">로그인 없이 들어가기</a>
     </main>
   );
 }

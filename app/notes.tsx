@@ -21,15 +21,11 @@ async function api(url: string, method = "GET", body?: object) {
     headers: body ? { "Content-Type": "application/json" } : undefined,
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (response.status === 401) {
-    // 저장하지 않은 글이 있으면 브라우저가 나가기 전에 한 번 묻는다.
-    window.location.assign("/login");
-  }
   const data = await response.json();
   return { status: response.status, ok: response.ok, data };
 }
 
-export default function Notes({ email }: { email: string }) {
+export default function Notes({ email }: { email: string | null }) {
   const [pages, setPages] = useState<PageSummary[]>([]);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<{ query: string; pages: PageSummary[] } | null>(null);
@@ -180,7 +176,7 @@ export default function Notes({ email }: { email: string }) {
       await api("/api/auth/logout", "POST");
       setSaved(null); // 나갈 때 다시 묻지 않도록
       setDraft(EMPTY);
-      setTimeout(() => window.location.assign("/login"));
+      setTimeout(() => window.location.assign("/"));
     });
   }
 
@@ -217,8 +213,13 @@ export default function Notes({ email }: { email: string }) {
             </ul>
           )}
         </nav>
-        <p className="hint email">{email}</p>
-        <button className="link" onClick={logout}>로그아웃</button>
+        <p className="hint email">{email ?? "로그인하지 않고 쓰는 중"}</p>
+        {email ? (
+          <button className="link" onClick={logout}>로그아웃</button>
+        ) : (
+          // 전체 이동이라야 저장하지 않은 글이 있을 때 브라우저가 한 번 묻는다.
+          <a className="link" href="/login">로그인</a>
+        )}
       </aside>
 
       <main>

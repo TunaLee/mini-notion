@@ -1,15 +1,15 @@
-import { fail, readJson, requireUser } from "@/lib/api";
+import { fail, readJson, requireActor } from "@/lib/api";
 import { createPage, getPage, listPages, parseContent } from "@/lib/pages";
 
 export async function GET(request: Request) {
-  const user = await requireUser(request);
-  if (user instanceof Response) return user;
+  const actor = await requireActor(request);
+  if (actor instanceof Response) return actor;
   return Response.json({ pages: listPages(new URL(request.url).searchParams.get("q") ?? "") });
 }
 
 export async function POST(request: Request) {
-  const user = await requireUser(request);
-  if (user instanceof Response) return user;
+  const actor = await requireActor(request);
+  if (actor instanceof Response) return actor;
 
   const data = await readJson(request);
   const content = data && parseContent(data);
@@ -19,5 +19,5 @@ export async function POST(request: Request) {
   if (parentId !== null && (typeof parentId !== "number" || !getPage(parentId))) {
     return fail(404, "윗글이 이미 지워졌어요");
   }
-  return Response.json({ page: createPage(parentId, content, user.id) }, { status: 201 });
+  return Response.json({ page: createPage(parentId, content, actor) }, { status: 201 });
 }

@@ -45,6 +45,11 @@ export async function endSession(): Promise<void> {
   store.delete(COOKIE);
 }
 
+/** 로그인하지 않은 사람이 고친 글에 적는 사용자 번호 */
+export function guestId(): number {
+  return getDb().prepare("SELECT id FROM users WHERE email = 'guest'").get()!.id as number;
+}
+
 export async function currentUser(): Promise<User | null> {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
